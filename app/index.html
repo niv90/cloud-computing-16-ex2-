@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width; initial-scale=1.0">
+		<script src="https://code.jquery.com/jquery-2.2.0.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		<style>
+		#imageContainer {
+   			overflow-y:scroll;
+   			overflow-x:scroll;
+		}
+		.center {
+		    margin: auto;
+		    width: 70%;
+		    border: 3px solid green;
+		    padding: 10px;
+		}
+		.center1{
+		    margin: auto;
+		    width: 70%;
+		    padding: 10px;
+		}
+		input[type=text], select {
+
+	    padding: 12px 20px;
+	    margin: 8px 0;
+	    display: inline-block;
+	    border: 1px solid #ccc;
+	    border-radius: 4px;
+	    box-sizing: border-box;
+	}
+	.button {
+	    border: none;
+	    color: white;
+	    text-align: center;
+	    text-decoration: none;
+	    display: inline-block;
+	    font-size: 16px;
+	    cursor: pointer;
+	    background-color: grey;
+	    padding: 7px;
+	}
+	#arrows{
+		position: relative;
+		left: 65%;
+		top: -33px;
+	}
+	#zoom{
+		position: relative;
+		left: 16%;
+		top: 38px;
+	}
+		</style>
+	</head>
+
+	<body>
+		<div class="center">
+			<header class="center1">
+				<h1 style="text-align: center;">Mandelbrot</h1>
+				
+				<input type="text" value="iterations" id="iterations">
+				<input type="text" value="xParts" id="xParts">
+				<input type="text" value="yParts" id="yParts"> 
+				<input class="button" type="button" value="Submit" id="submit"><br><br>
+				
+				<div id="zoom">
+					<button class="button" type="button" id="zoom-in">Zoom in</button>
+					<button style="margin-left: 20px" class="button" type="button" id="zoom-out">Zoom out</button>
+				</div>
+				
+				<div id="arrows">
+					<button class="button" onclick="upWin()" style="margin-left: 5%;"><span>&#8593;</span></button><br>
+					<button class="button" onclick="leftWin()"><span>&#8592;</span></button>
+					<button class="button" onclick="rightWin()" style="margin-left: 3%;"><span>&#8594;</span></button><br>
+					<button class="button" onclick="downWin()" style="margin-left: 5%;"><span>&#8595;</span></button><br><br>
+				</div>
+				
+			</header>
+
+			<div id="imageContainer" class="center1">
+			
+				
+			</div>
+
+		</div>
+		
+		<script>
+		
+		var xParts;
+		var xParts;
+		
+		(function(){
+			
+			//init tha page with img with default values from server
+			var imageContainer = document.getElementById("imageContainer");
+			var oReq = new XMLHttpRequest();
+			
+			$("#imageContainer").css("width", "500px");
+			$("#imageContainer").css("height", "500px");
+			
+			//iterations=500&xParts=20&yParts=20)
+			oReq.open("GET", "http://Mandel-Main-Server-71276041.us-west-2.elb.amazonaws.com/?iterations=30&xParts=50&yParts=50", true);
+			oReq.responseType = "arraybuffer";
+			oReq.onload = function(oEvent) {
+				var blob = new Blob([oReq.response], {type: "image/png"});
+				var url = URL.createObjectURL(blob);
+				var image = document.createElement('img');
+				$(image).attr('id', 'pic');
+				image.src = url;
+				imageContainer.appendChild(image);
+				};
+	
+			 oReq.send();
+			
+      	 })();
+			
+
+		</script>
+		<script>
+			$('input:text').focus(
+		    function(){
+		        $(this).val('');
+		    });
+
+		
+		    $('#zoom-in').click(function () {
+		        $('#pic').width($('#pic').width()*1.2);
+		        $('#pic').height($('#pic').height()*1.2);
+		
+		    });
+		        $('#zoom-out').click(function () {
+		        $('#pic').width($('#pic').width()/1.2);
+		        $('#pic').height($('#pic').height()/1.2);
+		
+		    });
+		    
+
+			function rightWin() {
+			   $("#imageContainer").animate({scrollLeft: "+="+10}); 
+			}
+			function leftWin() {
+			   $("#imageContainer").animate({scrollLeft: "-="+10}); 
+			  
+			}
+			function upWin() {
+			    $("#imageContainer").animate({scrollTop: "-="+10}); 
+			}
+			function downWin() {
+			    $("#imageContainer").animate({scrollTop: "+="+10}); 
+			}
+		
+		
+			$('#submit').bind('click', function () {  
+				var imageContainer = document.getElementById("imageContainer");
+				console.log("inside submit");
+				var iterations = document.getElementById('iterations').value;
+				var xParts = document.getElementById('xParts').value;
+				var yParts = document.getElementById('yParts').value;
+			    console.log(iterations + xParts + yParts);
+				
+					var oReq = new XMLHttpRequest();
+					oReq.open("GET", "http://Mandel-Main-Server-71276041.us-west-2.elb.amazonaws.com/?iterations="+iterations+"&xParts="+xParts+"&yParts="+yParts, true);
+					oReq.responseType = "arraybuffer";
+					oReq.onload = function(oEvent) {
+						var blob = new Blob([oReq.response], {type: "image/png"});
+						var url = URL.createObjectURL(blob);
+						var image = document.getElementById("pic");
+						image.src = url;
+						imageContainer.appendChild(image);
+						};
+			
+					 oReq.send();
+		});	
+		</script>
+	</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "express": "^4.14.0",
+    "node-png": "0.4.3",
+    "restify": "4.0.4"
+  }
+}
